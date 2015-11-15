@@ -17,6 +17,11 @@ class CentralBankRussianFederation {
     const filePath = '/data/serialized.cached';
     protected static $defaultCurrency = 'RUB';
     protected static $bankCurrency = 'EUR';
+    protected static $arCurrenciesFormat = array(
+        'RUB' => array(0,'.',' ','# руб'),
+        'EUR' => array(2,'.',' ','$ #'),
+        'USD' => array(2,'.',' ','€ #'),
+    );
 
     public static function getCurrentCurrency(){
         if(isset($_COOKIE['current_currency'])){
@@ -106,6 +111,12 @@ class CentralBankRussianFederation {
         return false;
     }
 
+    /**
+     * @param $price
+     * @param bool $currency_to
+     * @param bool $currency_from
+     * @return string
+     */
     public static function convert($price, $currency_to = false, $currency_from = false) {
         $k=1;
         if(!$currency_to){
@@ -120,6 +131,43 @@ class CentralBankRussianFederation {
 
         $b = self::get($currency_from);
         $k = $k/$b;
-        return number_format($price / $k,2,'.','');
+        return $price / $k;
+    }
+
+    /**
+     * @param $price
+     * @param bool $currency
+     * @return string
+     */
+    public static function format($price, $currency = false) {
+        if(!$currency){
+            $currency = self::getCurrentCurrency();
+        }
+
+        $params = array(2,'.','');
+
+        if(isset(self::$arCurrenciesFormat[$currency])){
+            $params = self::$arCurrenciesFormat[$currency];
+            array_pop($params);
+        }
+        array_unshift($params,$price);
+
+        $price = call_user_func_array('number_format', $params);
+
+        if(isset(self::$arCurrenciesFormat[$currency][3])){
+            $price = str_replace('#',$price,self::$arCurrenciesFormat[$currency][3]);
+        }
+        return $price;
+    }
+
+    /**
+     * @param $price
+     * @param bool $currency_to
+     * @param bool $currency_from
+     * @return string
+     */
+    public static function convertAndFormatted($price, $currency_to = false, $currency_from = false){
+        $price = self::convert($price, $currency_to = false, $currency_from = false);
+        return self::format($price, $currency_to);
     }
 }

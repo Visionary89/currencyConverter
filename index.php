@@ -10,6 +10,7 @@ require_once dirname(__FILE__).'/include/CentralBankRussianFederation.php';
 ?><!DOCTYPE html>
 <html>
 <head lang="en">
+    <meta charset="utf-8">
     <title>Test currency format</title>
     <style>
         .currency{
@@ -53,6 +54,7 @@ echo 'standard EUR: ' . $price . '<br>';
 echo 'USD: ' . CentralBankRussianFederation::convert($price,'USD') . '<br>';
 echo 'RUB: ' . CentralBankRussianFederation::convert($price,'RUB') . '<br>';
 echo 'current ('.CentralBankRussianFederation::getCurrentCurrency().'): ' . CentralBankRussianFederation::convert($price) . '<br>';
+echo 'current ('.CentralBankRussianFederation::getCurrentCurrency().'): ' . CentralBankRussianFederation::convertAndFormatted($price) . '<br>';
 ?>
 </body>
 </html>
